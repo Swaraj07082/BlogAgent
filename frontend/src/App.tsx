@@ -100,7 +100,7 @@ const App: React.FC = () => {
 
       <main className="pt-32 pb-20 px-8 max-w-7xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
-          
+
           {/* Left Column: Input Panel */}
           <div className="lg:col-span-5 space-y-12">
             <header className="space-y-4">
@@ -117,7 +117,7 @@ const App: React.FC = () => {
               <div className="space-y-3">
                 <label className="text-xs font-label uppercase tracking-widest text-[#4c616c] font-bold">The Creative Topic</label>
                 <div className="relative group">
-                  <textarea 
+                  <textarea
                     value={topic}
                     onChange={(e) => setTopic(e.target.value)}
                     className="w-full h-48 p-6 bg-stone-50 rounded-xl focus:ring-0 focus:outline-none border border-stone-200/50 resize-none font-body text-[#191c1d] text-lg leading-relaxed placeholder:text-stone-400 transition-colors focus:bg-white"
@@ -134,14 +134,13 @@ const App: React.FC = () => {
                 <label className="text-xs font-label uppercase tracking-widest text-[#4c616c] font-bold">Curatorial Voice</label>
                 <div className="flex flex-wrap gap-3">
                   {voices.map((v) => (
-                    <button 
+                    <button
                       key={v}
                       onClick={() => setBlogKind(v)}
-                      className={`px-5 py-2 rounded-full text-sm font-label transition-all ${
-                        blogKind === v 
-                          ? 'bg-[#012d1d] text-white' 
+                      className={`px-5 py-2 rounded-full text-sm font-label transition-all ${blogKind === v
+                          ? 'bg-[#012d1d] text-white'
                           : 'bg-[#cfe6f2] text-[#354a53] hover:bg-stone-200'
-                      }`}
+                        }`}
                     >
                       {v}
                     </button>
@@ -151,12 +150,11 @@ const App: React.FC = () => {
 
               {/* Action Button */}
               <div className="pt-4">
-                <button 
+                <button
                   disabled={loading || !topic.trim()}
                   onClick={handleGenerate}
-                  className={`w-full py-5 bg-gradient-to-br from-[#012d1d] to-[#1b4332] text-white rounded-xl font-label text-lg tracking-widest uppercase flex items-center justify-center space-x-3 shadow-lg shadow-emerald-900/5 hover:opacity-90 transition-all active:scale-[0.98] ${
-                    (loading || !topic.trim()) ? 'opacity-50 cursor-not-allowed' : ''
-                  }`}
+                  className={`w-full py-5 bg-gradient-to-br from-[#012d1d] to-[#1b4332] text-white rounded-xl font-label text-lg tracking-widest uppercase flex items-center justify-center space-x-3 shadow-lg shadow-emerald-900/5 hover:opacity-90 transition-all active:scale-[0.98] ${(loading || !topic.trim()) ? 'opacity-50 cursor-not-allowed' : ''
+                    }`}
                 >
                   {loading ? (
                     <Loader2 className="w-5 h-5 animate-spin" />
@@ -227,19 +225,19 @@ const App: React.FC = () => {
                   <article className="prose prose-stone max-w-none space-y-12">
                     {blogData.sections.map(([id, content]) => (
                       <section key={id} className="relative group">
-                        <ReactMarkdown 
+                        <ReactMarkdown
                           className="font-body text-lg leading-relaxed text-[#191c1d]"
                           components={{
-                            h1: ({node, ...props}) => <h1 className="text-4xl font-serif italic text-[#012d1d] mb-8" {...props} />,
-                            h2: ({node, ...props}) => <h2 className="text-2xl font-serif italic text-[#012d1d] mt-12 mb-6" {...props} />,
-                            h3: ({node, ...props}) => <h3 className="text-xl font-serif italic text-[#012d1d] mt-8 mb-4 border-l-2 border-emerald-900/20 pl-4" {...props} />,
-                            p: ({node, ...props}) => <p className="mb-6 opacity-90" {...props} />,
-                            ul: ({node, ...props}) => <ul className="list-disc pl-6 mb-6 space-y-3" {...props} />,
-                            li: ({node, ...props}) => <li className="text-base text-stone-700" {...props} />,
-                            blockquote: ({node, ...props}) => (
+                            h1: ({ node, ...props }) => <h1 className="text-4xl font-serif italic text-[#012d1d] mb-8" {...props} />,
+                            h2: ({ node, ...props }) => <h2 className="text-2xl font-serif italic text-[#012d1d] mt-12 mb-6" {...props} />,
+                            h3: ({ node, ...props }) => <h3 className="text-xl font-serif italic text-[#012d1d] mt-8 mb-4 border-l-2 border-emerald-900/20 pl-4" {...props} />,
+                            p: ({ node, ...props }) => <p className="mb-6 opacity-90" {...props} />,
+                            ul: ({ node, ...props }) => <ul className="list-disc pl-6 mb-6 space-y-3" {...props} />,
+                            li: ({ node, ...props }) => <li className="text-base text-stone-700" {...props} />,
+                            blockquote: ({ node, ...props }) => (
                               <blockquote className="border-l-4 border-emerald-900/30 pl-6 italic my-8 text-emerald-900/70" {...props} />
                             ),
-                            code: ({node, inline, className, children, ...props}: any) => {
+                            code: ({ node, inline, className, children, ...props }: any) => {
                               const match = /language-(\w+)/.exec(className || '')
                               return !inline ? (
                                 <div className="my-8 rounded-xl overflow-hidden border border-stone-200 shadow-sm">
