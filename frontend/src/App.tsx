@@ -1,5 +1,9 @@
+'use client'
+
 import React, { useState } from 'react'
+import Image from 'next/image'
 import ReactMarkdown from 'react-markdown'
+import { signIn, signOut, useSession } from 'next-auth/react'
 import { Sparkles, Search, BookOpen, Image as ImageIcon, Tag, Loader2 } from 'lucide-react'
 
 export type BlogSection = [number, string];
@@ -39,7 +43,10 @@ export type BlogResponse = {
   }
 }
 
+const apiBase = process.env.NEXT_PUBLIC_API_URL ?? 'http://127.0.0.1:4000'
+
 const App: React.FC = () => {
+  const { data: session, status } = useSession()
   const [topic, setTopic] = useState('')
   const [blogKind, setBlogKind] = useState('Professional')
   const [loading, setLoading] = useState(false)
@@ -48,21 +55,34 @@ const App: React.FC = () => {
 
   const handleGenerate = async () => {
     if (!topic.trim()) return
+    if (status !== 'authenticated') {
+      setError('Please sign in with Google first.')
+      return
+    }
 
     setLoading(true)
     setError(null)
     setBlogData(null)
 
     try {
-      // Points to the proxy defined in vite.config.ts
-      const response = await fetch('http://localhost:4000/create-blog', {
+      const tokenRes = await fetch('/api/auth/token')
+      if (!tokenRes.ok) {
+        throw new Error(tokenRes.status === 401 ? 'Session expired. Sign in again.' : 'Could not get auth token.')
+      }
+      const { token } = (await tokenRes.json()) as { token: string }
+
+      const response = await fetch(`${apiBase}/create-blog`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ topic }),
       })
 
+      if (response.status === 401) {
+        throw new Error('Unauthorized — sign in again.')
+      }
       if (!response.ok) {
         throw new Error(`Error: ${response.statusText}`)
       }
@@ -91,9 +111,39 @@ const App: React.FC = () => {
           </div>
           <div className="flex items-center space-x-6">
             <Search className="w-5 h-5 text-emerald-900 cursor-pointer" />
-            <button className="bg-[#012d1d] text-white px-5 py-2 rounded-md font-label text-sm tracking-wide transition-transform scale-100 active:scale-95">
-              Sign In
-            </button>
+            {status === 'loading' ? (
+              <span className="font-label text-xs uppercase tracking-widest text-stone-400">…</span>
+            ) : session ? (
+              <div className="flex items-center gap-3">
+                {session.user?.image ? (
+                  <Image
+                    src={session.user.image}
+                    alt=""
+                    width={36}
+                    height={36}
+                    className="h-9 w-9 rounded-full border border-stone-200 object-cover"
+                  />
+                ) : null}
+                <span className="hidden max-w-[140px] truncate font-label text-xs text-stone-600 sm:inline">
+                  {session.user?.name ?? session.user?.email}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => signOut()}
+                  className="rounded-md bg-stone-200 px-4 py-2 font-label text-sm tracking-wide text-stone-800 transition-transform active:scale-95 hover:bg-stone-300"
+                >
+                  Sign out
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => signIn('google')}
+                className="rounded-md bg-[#012d1d] px-5 py-2 font-label text-sm tracking-wide text-white transition-transform active:scale-95 hover:opacity-90"
+              >
+                Sign in with Google
+              </button>
+            )}
           </div>
         </div>
       </nav>
@@ -151,9 +201,9 @@ const App: React.FC = () => {
               {/* Action Button */}
               <div className="pt-4">
                 <button
-                  disabled={loading || !topic.trim()}
+                  disabled={loading || !topic.trim() || status !== 'authenticated'}
                   onClick={handleGenerate}
-                  className={`w-full py-5 bg-gradient-to-br from-[#012d1d] to-[#1b4332] text-white rounded-xl font-label text-lg tracking-widest uppercase flex items-center justify-center space-x-3 shadow-lg shadow-emerald-900/5 hover:opacity-90 transition-all active:scale-[0.98] ${(loading || !topic.trim()) ? 'opacity-50 cursor-not-allowed' : ''
+                  className={`w-full py-5 bg-gradient-to-br from-[#012d1d] to-[#1b4332] text-white rounded-xl font-label text-lg tracking-widest uppercase flex items-center justify-center space-x-3 shadow-lg shadow-emerald-900/5 hover:opacity-90 transition-all active:scale-[0.98] ${(loading || !topic.trim() || status !== 'authenticated') ? 'opacity-50 cursor-not-allowed' : ''
                     }`}
                 >
                   {loading ? (

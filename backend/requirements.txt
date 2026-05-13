@@ -4,3 +4,5 @@ langchain_groq
 dotenv
 langgraph
 uvicorn
+PyJWT
+psycopg2-binary
