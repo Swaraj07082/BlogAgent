@@ -125,10 +125,17 @@ class State(TypedDict):
     final: str
 
 
+GROQ_API_KEY = (os.getenv("GROQ_API_KEY") or "").strip()
+if not GROQ_API_KEY:
+    raise RuntimeError(
+        "GROQ_API_KEY is not configured. Set it in the repo-root `.env` (or export it) before running."
+    )
+
 llm = ChatGroq(
-        api_key="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",
-        model="llama-3.3-70b-versatile",
-        )
+    # Read API key from environment to avoid committing secrets.
+    api_key=GROQ_API_KEY,
+    model="llama-3.3-70b-versatile",
+)
 
 
 ROUTER_SYSTEM = """You are a routing module for a technical blog planner.
